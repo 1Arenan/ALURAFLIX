@@ -1,54 +1,395 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet">
-    <title>aluraflix</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clone Instagram - UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        
+        /* Barra Lateral */
+        .sidebar {
+            width: 72px;
+            border-right: 1px solid #262626;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            align-items: center;
+        }
+
+        .sidebar-icon {
+            margin-bottom: 35px;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .sidebar-icon img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #262626;
+        }
+
+        /* Container Principal */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow-y: auto;
+            justify-content: center;
+            padding-top: 30px;
+        }
+
+        .content-area {
+            width: 100%;
+            max-width: 470px;
+            margin-right: 64px;
+        }
+
+        /* Stories */
+        .stories-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .stories-container::-webkit-scrollbar { display: none; }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 66px;
+            cursor: pointer;
+        }
+
+        .story-ring {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            padding: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .story-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            overflow: hidden;
+        }
+
+        .story-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-username {
+            font-size: 12px;
+            margin-top: 5px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            text-align: center;
+            color: #f5f5f5;
+        }
+
+        /* Post do Feed */
+        .post {
+            border-bottom: 1px solid #262626;
+            padding-bottom: 20px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .post-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-user-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .post-user-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-username { font-weight: 600; font-size: 14px; }
+        .post-time { color: #a8a8a8; font-weight: 400; }
+        .post-subtitle { display: block; font-size: 12px; font-weight: 400; }
+
+        .post-image-container {
+            width: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #262626;
+        }
+
+        .post-image-container img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Painel Direito */
+        .right-panel {
+            width: 319px;
+            margin-top: 15px;
+        }
+
+        .profile-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .profile-summary .info { display: flex; align-items: center; gap: 15px; }
+        .profile-summary .avatar { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; }
+        .profile-summary .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-summary .names .username { font-weight: 600; font-size: 14px; }
+        .profile-summary .names .fullname { color: #a8a8a8; font-size: 14px; margin-top: 2px; }
+        .action-text { color: #0095f6; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+        .suggestions-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .suggestions-header span { color: #a8a8a8; font-weight: 600; font-size: 14px; }
+        .suggestions-header a { font-size: 12px; font-weight: 600; color: #fff; }
+
+        /* Modal / Chat Flutuante */
+        .chat-overlay {
+            position: fixed;
+            bottom: 0;
+            right: 80px;
+            width: 340px;
+            height: 520px;
+            background-color: #262626;
+            border: 1px solid #363636;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+            z-index: 1000;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #363636;
+            background-color: #121212;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .chat-header-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; }
+        .chat-header-actions { display: flex; gap: 18px; color: #fff; font-size: 18px; }
+
+        .chat-content {
+            flex: 1;
+            background-color: #121212;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .chat-image-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .chat-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .chat-input-area {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #121212;
+        }
+
+        .chat-input-box {
+            flex: 1;
+            background-color: #262626;
+            border: 1px solid #363636;
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: #fff;
+            outline: none;
+        }
+
+        .chat-icons { display: flex; gap: 12px; font-size: 20px; color: #fff; cursor: pointer; }
+    </style>
 </head>
-
 <body>
-    <header>aluraFLIX</header>
 
-    <section class="chamada">
-        <div class="chamada-texto">
-            <h1>ATRAVÉS DO ARANHAVERSO</h1>
-            <p>#homem-aranha</p>
+    <nav class="sidebar">
+        <i class="fa-brands fa-instagram sidebar-icon"></i>
+        <i class="fa-solid fa-house sidebar-icon"></i>
+        <i class="fa-solid fa-magnifying-glass sidebar-icon"></i>
+        <i class="fa-brands fa-wpexplorer sidebar-icon"></i>
+        <i class="fa-solid fa-clapperboard sidebar-icon"></i>
+        <i class="fa-regular fa-paper-plane sidebar-icon"></i>
+        <i class="fa-regular fa-heart sidebar-icon"></i>
+        <i class="fa-regular fa-square-plus sidebar-icon"></i>
+        <div class="sidebar-icon">
+            <img src="https://picsum.photos/100" alt="Seu Perfil">
+        </div>
+        <i class="fa-solid fa-bars sidebar-icon" style="margin-top: auto;"></i>
+    </nav>
+
+    <main class="main-container">
+        <div class="content-area">
+            
+            <div class="stories-container">
+                <div class="story">
+                    <div class="story-ring"><div class="story-img"><img src="https://picsum.photos/101" alt="Story"></div></div>
+                    <span class="story-username">brun1zyz.r...</span>
+                </div>
+                <div class="story">
+                    <div class="story-ring"><div class="story-img"><img src="https://picsum.photos/102" alt="Story"></div></div>
+                    <span class="story-username">lucindovp....</span>
+                </div>
+                <div class="story">
+                    <div class="story-ring"><div class="story-img"><img src="https://picsum.photos/103" alt="Story"></div></div>
+                    <span class="story-username">iae_kayke_...</span>
+                </div>
+                <div class="story">
+                    <div class="story-ring"><div class="story-img"><img src="https://picsum.photos/104" alt="Story"></div></div>
+                    <span class="story-username">renan_vini...</span>
+                </div>
+                <div class="story">
+                    <div class="story-ring"><div class="story-img"><img src="https://picsum.photos/105" alt="Story"></div></div>
+                    <span class="story-username">thurxpz.012</span>
+                </div>
+                <div class="story">
+                    <div class="story-ring"><div class="story-img"><img src="https://picsum.photos/106" alt="Story"></div></div>
+                    <span class="story-username">arthur077_...</span>
+                </div>
+            </div>
+
+            <article class="post">
+                <div class="post-header">
+                    <div class="post-user-info">
+                        <div class="post-user-img">
+                            <img src="https://picsum.photos/150" alt="Avatar do Autor">
+                        </div>
+                        <span class="post-username">isaque_gabriel_044 <span class="post-time">• 1 d</span><br><span class="post-subtitle">Conteúdo de IA</span></span>
+                    </div>
+                    <i class="fa-solid fa-ellipsis" style="color: #fff; cursor: pointer;"></i>
+                </div>
+                <div class="post-image-container">
+                    <!-- Imagem grande do feed -->
+                    <img src="https://picsum.photos/600/750" alt="Post do Feed">
+                </div>
+            </article>
         </div>
 
-        <div>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/gt_fAE1Eg2Q?si=EEv-tsY_b1B2OwKE"
-                title="YouTube video player" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
-    </section>
+        <aside class="right-panel">
+            <div class="profile-summary">
+                <div class="info">
+                    <div class="avatar">
+                        <img src="https://picsum.photos/100" alt="Seu Perfil Atual">
+                    </div>
+                    <div class="names">
+                        <div class="username">renanguimaraesdo</div>
+                        <div class="fullname">Renan Guimarães do Rosario</div>
+                    </div>
+                </div>
+                <div class="action-text">Trocar</div>
+            </div>
 
-    <section class="categoria">
-        <h2>Filmes e séries</h2>
-        <div class="categoria-videos">
-            <a href="https://www.youtube.com/watch?v=cs15QqG6Gjc">
-                <img src="https://img.youtube.com/vi/cs15QqG6Gjc/maxresdefault.jpg" />
-            </a>
-            <a href="https://www.youtube.com/watch?v=nCmIwcycUJ8">
-                <img src="https://img.youtube.com/vi/nCmIwcycUJ8/maxresdefault.jpg" />
-            </a>
-            <a href="https://www.youtube.com/watch?v=FvRmEapoHRc">
-                <img src="https://img.youtube.com/vi/FvRmEapoHRc/maxresdefault.jpg" />
-            </a>
-            <a href="https://www.youtube.com/watch?v=Ipkw_hWW-Hw">
-                <img src="https://img.youtube.com/vi/Ipkw_hWW-Hw/maxresdefault.jpg" />
-            </a>
-            <a href="https://www.youtube.com/watch?v=d4DzMNGoyis">
-                <img src="https://img.youtube.com/vi/d4DzMNGoyis/maxresdefault.jpg" />
-            </a>
+            <div class="suggestions-header">
+                <span>Sugestões para você</span>
+                <a href="#">Ver tudo</a>
+            </div>
+            
+            <div class="profile-summary" style="margin-bottom: 12px;">
+                <div class="info">
+                    <div class="avatar" style="width: 32px; height: 32px;">
+                        <img src="https://picsum.photos/110" alt="Sugestão">
+                    </div>
+                    <div class="names">
+                        <div class="username" style="font-size: 13px;">guil...</div>
+                    </div>
+                </div>
+                <div class="action-text">Seguir</div>
+            </div>
+        </aside>
+    </main>
+
+    <div class="chat-overlay">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Lucaxz ツ</span>
+            </div>
+            <div class="chat-header-actions">
+                <i class="fa-solid fa-phone"></i>
+                <i class="fa-solid fa-video"></i>
+                <i class="fa-solid fa-xmark"></i>
+            </div>
         </div>
-    </section>
+        
+        <div class="chat-content">
+            <div style="font-size: 11px; color: #a8a8a8; margin-bottom: 10px;">QUI, 22:50</div>
+            <div class="chat-image-placeholder">
+                <!-- Imagem do Chat -->
+                <img src="https://picsum.photos/400/600" alt="Imagem enviada no chat">
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <i class="fa-regular fa-face-smile chat-icons"></i>
+            <input type="text" class="chat-input-box" placeholder="Mensagem...">
+            <i class="fa-solid fa-microphone chat-icons"></i>
+            <i class="fa-regular fa-image chat-icons"></i>
+            <i class="fa-regular fa-heart chat-icons"></i>
+        </div>
+    </div>
 
 </body>
-
 </html>
-
